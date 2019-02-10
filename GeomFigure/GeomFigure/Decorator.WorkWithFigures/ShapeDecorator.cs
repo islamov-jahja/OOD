@@ -74,7 +74,7 @@ namespace GeomFigure.Decorator.WorkWithFigures
             }
         }
 
-        public float GetDistanceBetweenPoints(Vector2f point1, Vector2f point2)
+        protected float GetDistanceBetweenPoints(Vector2f point1, Vector2f point2)
         {
             Vector2f resultPoint = point2 - point1;
             return (float)Math.Sqrt((resultPoint.X * resultPoint.X + resultPoint.Y * resultPoint.Y));
