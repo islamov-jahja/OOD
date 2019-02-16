@@ -19,6 +19,7 @@ namespace GeomFigure
             RenderWindow win = new RenderWindow(new VideoMode(800, 600), "Figure editor");
             Controller controller = new Controller("input.txt", "output.txt");
             controller.Print();
+            
 
             while (win.IsOpen)
             {
