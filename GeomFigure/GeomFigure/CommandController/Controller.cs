@@ -16,7 +16,7 @@ namespace GeomFigure.CommandController
         private List<ShapeDecorator> m_geomFigures = new List<ShapeDecorator>();
         string m_readingFilePath;
         string m_writingFilePath { get; set; }
-
+        FigureComposite selectionFigures = new FigureComposite();
 
         public Controller()
         {
@@ -29,13 +29,69 @@ namespace GeomFigure.CommandController
             this.m_geomFigures = InitGeomFiguresList();
         }
 
+        public void ToUnionToGroup()
+        {
+            selectionFigures.ToGroup();
+        }
+
+        public void ToUnGroup()
+        {
+            selectionFigures.ToUngroup();
+        }
+
+        public void ToMoveFigures(RenderWindow win)
+        {
+            selectionFigures.ToMoveFigures(win);
+        }
+
+        public void ToCalculateSubCoords(Vector2i mousePos)
+        {
+            selectionFigures.ToCalculateSubCoords(mousePos);
+        }
+
+        public ShapeDecorator IsFigure(Vector2i mousePos)
+        {
+            for (int i = 0; i < m_geomFigures.Count; i++)
+                if (m_geomFigures[i].MouseOnFigure(mousePos))
+                    return m_geomFigures[i];
+
+            return null;
+        }
+
+        public bool FigureOnGroup(ShapeDecorator shape)
+        {
+            return selectionFigures.FigureOnComposite(shape);
+        }
+
         public void DrawFigures(RenderWindow window)
         {
             foreach (ShapeDecorator shape in this.m_geomFigures)
             {
-                shape.FillColor = Color.White;
                 shape.DrawFigure(window);
             }
+        }
+
+        public void SelectFigure(ShapeDecorator shape)
+        {
+            String identifier = shape.GroupIdentifier.Peek();
+
+            if (shape.GroupIdentifier.Peek() != "0")
+            {
+                for (int i = 0; i < m_geomFigures.Count; i++)
+                    if (m_geomFigures[i].GroupIdentifier.Peek() == identifier)
+                        selectionFigures.AddFigure(m_geomFigures[i]);
+            }
+            else
+            {
+                selectionFigures.AddFigure(shape);
+            }
+
+            selectionFigures.ToSelectFigures();
+        }
+
+        public void CleanSelection()
+        {
+            selectionFigures.RemoveSelectionFigures();
         }
 
         public void setReadingFilePath(string filePath)
@@ -43,6 +99,16 @@ namespace GeomFigure.CommandController
             this.m_readingFilePath = filePath;
             this.m_geomFigures.Clear();
             this.m_geomFigures = InitGeomFiguresList();
+        }
+
+        public float GetPerimeterOfFigures()
+        {
+            return selectionFigures.GetPerimeter();
+        }
+
+        public float GetAreaOfFigures()
+        {
+            return selectionFigures.GetArea();
         }
 
         public void Print()
@@ -71,20 +137,25 @@ namespace GeomFigure.CommandController
         {
             StreamReader fileRead = new StreamReader(this.m_readingFilePath);
             string command;
+            ShapeDecorator shape = new CircleDecorator(new CircleShape(5));
+
             while ((command = fileRead.ReadLine()) != null)
             {
                 if (command.Contains("TRIANGLE"))
                 {
-                    listWithFigures.Add(GetTrinagleFigure(command));
+                    shape = GetTrinagleFigure(command);
                 }
                 else if (command.Contains("RECTANGLE"))
                 {
-                    listWithFigures.Add(GetRectangleFigure(command));
+                    shape = GetRectangleFigure(command);
                 }
                 else if (command.Contains("CIRCLE"))
                 {
-                    listWithFigures.Add(GetCircleFigure(command));
+                    shape = GetCircleFigure(command);
                 }
+
+                shape.SetFillColor(Color.White);
+                listWithFigures.Add(shape);
             }
         }
 

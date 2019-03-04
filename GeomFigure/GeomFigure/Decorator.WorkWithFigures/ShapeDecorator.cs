@@ -14,9 +14,24 @@ namespace GeomFigure.Decorator.WorkWithFigures
         protected float m_perimeter;
         protected float m_area;
 
+        public Vector2i subCoords;
+        public Stack<String> GroupIdentifier = new Stack<String>();
+        public ShapeDecorator() { }
+
         public ShapeDecorator(Shape component)
         {
             this.m_component = component;
+            GroupIdentifier.Push("0");
+        }
+
+        public void SetCoords(Vector2f coords)
+        {
+            m_component.Position = coords;
+        }
+
+        public Vector2f GetCoords()
+        {
+            return m_component.Position;
         }
 
         public virtual float GetPerimeter()
@@ -78,6 +93,26 @@ namespace GeomFigure.Decorator.WorkWithFigures
         {
             Vector2f resultPoint = point2 - point1;
             return (float)Math.Sqrt((resultPoint.X * resultPoint.X + resultPoint.Y * resultPoint.Y));
+        }
+
+        public void SetFillColor(Color color)
+        {
+            m_component.FillColor = color;
+        }
+
+        public void SetOutLineColor(Color color)
+        {
+            m_component.OutlineColor = color;
+        }
+
+        public void SetOutlineThickness(float thickness)
+        {
+            m_component.OutlineThickness = thickness;
+        }
+
+        public bool MouseOnFigure(Vector2i coord)
+        {
+            return m_component.GetGlobalBounds().Contains(coord.X, coord.Y);
         }
     }
 }
